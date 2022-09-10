@@ -50,11 +50,12 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 8; // FIXME Set back right steer encoder ID
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(159.6); // FIXME Measure and set back right steer offset
 
-    public static final class Feeder {
+  public static final class Feeder {
     public static final int frontCargoFeeder = 10;
     public static final int rearCargoFeeder = 9;
-    }
-
+  }
+  
+  public static final class Turret {
     public static final int adjustableHood = 12;
 
     public static final int topRollers = 13;
@@ -62,6 +63,8 @@ public final class Constants {
     public static final int mainFlywheel = 14;
 
     public static final int turret = 15;
+
+  }
 
       /**
    * Configuration of the intake subsystem.
@@ -89,7 +92,7 @@ public final class Constants {
   }
 
     /**
-   * Controls the logging of detailed information about the robot.
-   */
-  public static final boolean kEnableDetailedLogging = true;
+     * Controls the logging of detailed information about the robot.
+     */
+    public static final boolean kEnableDetailedLogging = true;
 }
