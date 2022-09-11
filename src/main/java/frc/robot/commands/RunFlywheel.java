@@ -11,11 +11,11 @@ import frc.robot.subsystems.Launcher;
 
 public class RunFlywheel extends CommandBase {
   private final Launcher m_launcher;
-  private final DoubleSupplier m_speed;
+  //private final DoubleSupplier m_speed;
   /** Creates a new RunFlywheel. */
-  public RunFlywheel(Launcher launcher, DoubleSupplier speed ) {
+  public RunFlywheel(Launcher launcher /*, DoubleSupplier speed*/ ) {
     m_launcher = launcher;
-    m_speed = speed;
+    //m_speed = speed;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(launcher);
   }
@@ -27,7 +27,7 @@ public class RunFlywheel extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_launcher.run(.5);
+    m_launcher.run(.90);
   }
 
   // Called once the command ends or is interrupted.

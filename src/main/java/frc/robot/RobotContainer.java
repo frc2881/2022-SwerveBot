@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDriveCommand;
-import frc.robot.commands.ExtendIntake;
-import frc.robot.commands.FeedFeeder;
-import frc.robot.commands.HoldFeeder;
 import frc.robot.commands.RunFlywheel;
-import frc.robot.commands.RunIntake;
+import frc.robot.commands.Feeder.FeedFeeder;
+import frc.robot.commands.Feeder.HoldFeeder;
+import frc.robot.commands.Intake.ExtendIntake;
+import frc.robot.commands.Intake.RunIntake;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
@@ -57,7 +57,6 @@ public class RobotContainer {
             () -> -modifyAxis(driverController.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
             () -> -modifyAxis(driverController.getRightX()) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
-    m_launcher.setDefaultCommand(new RunFlywheel(m_launcher, () -> manipulatorController.getLeftTriggerAxis()));
     // Configure the button bindings
     configureButtonBindings();
 
@@ -89,7 +88,8 @@ public class RobotContainer {
     new JoystickButton(manipulatorController, XboxController.Button.kY.value).
             whileHeld(new FeedFeeder(m_feeder));
 
-    
+    new JoystickButton(manipulatorController, XboxController.Button.kLeftBumper.value).
+            whenHeld(new RunFlywheel(m_launcher));
   }
 
   /**
