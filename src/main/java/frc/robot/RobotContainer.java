@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,6 +52,9 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
   }
 
   /**
@@ -101,5 +106,12 @@ public class RobotContainer {
     value = Math.copySign(value * value, value);
 
     return value;
+  }
+
+  public void updateMatchTime() {
+    double matchTime = Math.floor(DriverStation.getMatchTime());
+    if (matchTime != -1) {
+      SmartDashboard.putNumber("Match Time", matchTime);
+    }
   }
 }
