@@ -6,19 +6,24 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 
 public class RunIntake extends CommandBase {
-  private Intake intake;
+  private Intake m_intake;
+  private Feeder m_feeder;
 
-  public RunIntake(Intake intake) {
-    this.intake = intake;
+  public RunIntake(Intake intake, Feeder feeder) {
+    m_intake = intake;
+    m_feeder = feeder;
   }
 
   // called when the command is initially scheduled
   @Override
   public void initialize() {
-    intake.run(1.0);
+    m_intake.run(1.0);
+    m_feeder.run("HOLD");
+
   }
 
   // called every time the scheduler runs while the command is scheduled
@@ -28,7 +33,8 @@ public class RunIntake extends CommandBase {
   // called once the command ends or is interrupted
   @Override
   public void end(boolean interrupted) {
-    intake.run(0.0);
+    m_intake.run(0.0);
+    m_feeder.run("STOP");
   }
 
   // returns false when the command should end

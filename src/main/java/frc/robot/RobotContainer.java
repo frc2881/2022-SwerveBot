@@ -8,14 +8,18 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.ExtendIntake;
+import frc.robot.commands.FeedFeeder;
+import frc.robot.commands.HoldFeeder;
 import frc.robot.commands.RunIntake;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Pneumatics;
 
@@ -28,8 +32,9 @@ import frc.robot.subsystems.Pneumatics;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
-  private final Intake intake = new Intake();
-  private final Pneumatics pneumatics = new Pneumatics();
+  private final Intake m_intake = new Intake();
+  private final Pneumatics m_pneumatics = new Pneumatics();
+  private final Feeder m_feeder = new Feeder();
 
   private final XboxController driverController = new XboxController(0);
   private final XboxController manipulatorController = new XboxController(1);
@@ -70,10 +75,16 @@ public class RobotContainer {
             .whenPressed(m_drivetrainSubsystem::zeroGyroscope);
 
     new JoystickButton(manipulatorController, XboxController.Button.kX.value).
-            whileHeld(new RunIntake(intake));
+            whileHeld(new RunIntake(m_intake, m_feeder));
 
     new JoystickButton(manipulatorController, XboxController.Button.kA.value).
-            whileHeld(new ExtendIntake(intake));
+            whileHeld(new ExtendIntake(m_intake));
+
+    new JoystickButton(manipulatorController, XboxController.Button.kB.value).
+            whileHeld(new HoldFeeder(m_feeder));
+
+    new JoystickButton(manipulatorController, XboxController.Button.kY.value).
+            whileHeld(new FeedFeeder(m_feeder));
   }
 
   /**
