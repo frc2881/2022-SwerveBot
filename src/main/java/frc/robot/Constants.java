@@ -56,7 +56,7 @@ public final class Constants {
     public static final double defaultSpeed = 0.5;
   }
   
-  public static final class Turret {
+  public static final class Launcher {
     public static final int adjustableHood = 12;
 
     public static final int topRollers = 13;

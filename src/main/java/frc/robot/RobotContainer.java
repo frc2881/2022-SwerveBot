@@ -17,10 +17,12 @@ import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.ExtendIntake;
 import frc.robot.commands.FeedFeeder;
 import frc.robot.commands.HoldFeeder;
+import frc.robot.commands.RunFlywheel;
 import frc.robot.commands.RunIntake;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Launcher;
 import frc.robot.subsystems.Pneumatics;
 
 /**
@@ -31,6 +33,7 @@ import frc.robot.subsystems.Pneumatics;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  private final Launcher m_launcher = new Launcher();
   private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
   private final Intake m_intake = new Intake();
   private final Pneumatics m_pneumatics = new Pneumatics();
@@ -38,7 +41,7 @@ public class RobotContainer {
 
   private final XboxController driverController = new XboxController(0);
   private final XboxController manipulatorController = new XboxController(1);
-
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -54,7 +57,7 @@ public class RobotContainer {
             () -> -modifyAxis(driverController.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
             () -> -modifyAxis(driverController.getRightX()) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
-
+    m_launcher.setDefaultCommand(new RunFlywheel(m_launcher, () -> manipulatorController.getLeftTriggerAxis()));
     // Configure the button bindings
     configureButtonBindings();
 
@@ -85,6 +88,8 @@ public class RobotContainer {
 
     new JoystickButton(manipulatorController, XboxController.Button.kY.value).
             whileHeld(new FeedFeeder(m_feeder));
+
+    
   }
 
   /**
