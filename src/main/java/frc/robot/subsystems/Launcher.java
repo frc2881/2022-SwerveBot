@@ -19,6 +19,7 @@ public class Launcher extends SubsystemBase {
     m_mainFlywheel.setOpenLoopRampRate(1.25);
     m_mainFlywheel.setIdleMode(IdleMode.kCoast);
     
+    m_topRollers.setOpenLoopRampRate(1.25);
     m_topRollers.setIdleMode(IdleMode.kCoast);
   }
 
