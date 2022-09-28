@@ -27,8 +27,8 @@ public class Launcher extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void run (double speed ){
+  public void run (double speed, double rollerSpeed){
     m_mainFlywheel.set(speed);
-    m_topRollers.set(speed);
+    m_topRollers.set(-rollerSpeed);
   }
 }

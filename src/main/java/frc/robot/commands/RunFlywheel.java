@@ -27,13 +27,13 @@ public class RunFlywheel extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_launcher.run(.90);
+    m_launcher.run(.40, .95); // .7 and .2 from Hub :: .45 and .95 from launchpad with hood ::
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_launcher.run(0);
+    m_launcher.run(0, 0);
   }
 
   // Returns true when the command should end.
