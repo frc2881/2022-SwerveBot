@@ -31,7 +31,6 @@ public class Intake extends SubsystemBase {
   private final DoubleLogEntry m_logBusVoltage;
   private final DoubleLogEntry m_logCurrent;
   private final BooleanLogEntry m_logSolenoid;
-  private boolean shootExtend = false;
   private boolean buttonExtend = false;
   //private int counter = 0;
 
@@ -69,8 +68,6 @@ public class Intake extends SubsystemBase {
 
   public void reset() {
     run(0.0);
-    shootExtend = false;
-    buttonExtend = false;
     retract();
   }
 
@@ -95,31 +92,12 @@ public class Intake extends SubsystemBase {
 
   public void retract() {
     buttonExtend = false;
-      if(shootExtend == false){
-              m_solenoid.set(false);
+      m_solenoid.set(false);
       if(kEnableDetailedLogging) {
         m_logSolenoid.append(m_solenoid.get());
       }
     }
-  }
 
-  public void shootExtend() {
-    shootExtend = true;
-      m_solenoid.set(true);
-      if(kEnableDetailedLogging) {
-        m_logSolenoid.append(m_solenoid.get());
-      }
-  }
-
-  public void shootRetract() {
-    shootExtend = false;
-      if(buttonExtend == false){
-              m_solenoid.set(false);
-      if(kEnableDetailedLogging) {
-        m_logSolenoid.append(m_solenoid.get());
-      }
-    }
-  }
 
   @Override
   public void initSendable(SendableBuilder builder) {

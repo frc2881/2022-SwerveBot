@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -16,11 +18,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.RunFlywheel;
+import frc.robot.commands.Auto.SimpleAuto;
 import frc.robot.commands.Feeder.FeedFeeder;
 import frc.robot.commands.Feeder.HoldFeeder;
+import frc.robot.commands.Intake.ExtendAndRunIntake;
 import frc.robot.commands.Intake.ExtendIntake;
 import frc.robot.commands.Intake.RunIntake;
-import frc.robot.commands.RunFlywheel;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Hood;
@@ -38,7 +42,6 @@ import frc.robot.subsystems.PrettyLights;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final PowerDistribution powerHub = new PowerDistribution(2, ModuleType.kRev);
-  
   private final Launcher m_launcher = new Launcher();
   private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
   private final Intake m_intake = new Intake();
@@ -84,22 +87,37 @@ public class RobotContainer {
             // No requirements because we don't need to interrupt anything
             .whenPressed(m_drivetrainSubsystem::zeroGyroscope);
 
-    new JoystickButton(manipulatorController, XboxController.Button.kX.value).
+    new JoystickButton(driverController, XboxController.Button.kLeftBumper.value).
             whileHeld(new RunIntake(m_intake, m_feeder));
-
-    new JoystickButton(manipulatorController, XboxController.Button.kA.value).
+    
+    buttonFromDouble(() -> driverController.getLeftTriggerAxis()).
             whileHeld(new ExtendIntake(m_intake));
+    
+    buttonFromDouble(() -> driverController.getRightTriggerAxis()).
+            whileHeld(new ExtendAndRunIntake(m_intake, m_feeder));
 
     new JoystickButton(manipulatorController, XboxController.Button.kB.value).
             whileHeld(new HoldFeeder(m_feeder));
 
-    new JoystickButton(manipulatorController, XboxController.Button.kY.value).
-            whileHeld(new FeedFeeder(m_feeder));
-
     new JoystickButton(manipulatorController, XboxController.Button.kLeftBumper.value).
-            whenHeld(new RunFlywheel(m_launcher));
+            whileHeld(new RunFlywheel(m_launcher, "EJECT"));
+
+    buttonFromDouble(() -> manipulatorController.getLeftTriggerAxis()).
+            whileHeld(new RunFlywheel(m_launcher, "SHOOT"));
+
+    buttonFromDouble(() -> manipulatorController.getRightTriggerAxis()).
+            whileHeld(new FeedFeeder(m_feeder));
   }
 
+  private Button buttonFromDouble(DoubleSupplier value) {
+    return new Button() {
+      @Override
+      public boolean get() {
+        return Math.abs(value.getAsDouble()) > 0.1;
+      }
+    };
+  }
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -107,7 +125,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new InstantCommand();
+    return new SimpleAuto(m_drivetrainSubsystem, m_launcher, m_feeder);
   }
 
   private static double deadband(double value, double deadband) {
@@ -135,7 +153,7 @@ public class RobotContainer {
   public void updateMatchTime() {
     double matchTime = Math.floor(DriverStation.getMatchTime());
     if (matchTime != -1) {
-      SmartDashboard.putNumber("MatchTime", matchTime);
+      SmartDashboard.putNumber("Match Time", matchTime);
     }
   }
 }

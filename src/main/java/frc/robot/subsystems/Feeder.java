@@ -11,11 +11,13 @@ import static frc.robot.Constants.Feeder.defaultSpeed;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Feeder extends SubsystemBase {
   private final CANSparkMax m_frontRoller;
   private final CANSparkMax m_rearRoller;
+  private final DigitalInput m_beamBreak = new DigitalInput(0);
 
   /** Creates a new Feeder. */
   public Feeder() {
@@ -30,17 +32,14 @@ public class Feeder extends SubsystemBase {
   }
 
   /**
-   * "HOLD" for holding a ball
-   * "FEED" for feeding a ball into the flywheel
-   * "STOP" for stopping the feeder
    * 
+   * @param state
+   * Put "HOLD" for holding a ball.
+   * Put "FEED" for feeding a ball into the flywheel.
+   * Put "STOP" for stopping the feeder.
    */
   public void run(String state) {
-    if(state == "STOP"){
-      m_frontRoller.set(0);
-      m_rearRoller.set(0);
-    }
-    else if(state == "HOLD"){
+    if(state == "HOLD"){
       m_frontRoller.set(defaultSpeed);
       m_rearRoller.set(defaultSpeed);
     }
@@ -48,7 +47,19 @@ public class Feeder extends SubsystemBase {
       m_frontRoller.set(defaultSpeed);
       m_rearRoller.set(-defaultSpeed);
     }
+  }
 
+  public void stop() {
+    m_frontRoller.set(0);
+    m_rearRoller.set(0);
+  }
 
+  public boolean isBall(){
+    if(m_beamBreak.get() == false){
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 }

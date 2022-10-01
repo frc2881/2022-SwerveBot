@@ -206,7 +206,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void periodic() {
     SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
-
+/*
     if((states[0].speedMetersPerSecond < 0.1) && (states[1].speedMetersPerSecond < 0.1) &&
        (states[2].speedMetersPerSecond < 0.1) && (states[3].speedMetersPerSecond < 0.1) &&
        !DriverStation.isAutonomous()) {
@@ -214,11 +214,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
       m_frontRightModule.set(0, Math.toRadians(45));
       m_backLeftModule.set(0, Math.toRadians(45));
       m_backRightModule.set(0, Math.toRadians(-45));
-    } else {
+    } else { */
       m_frontLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[0].angle.getRadians());
       m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[1].angle.getRadians());
       m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[2].angle.getRadians());
       m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[3].angle.getRadians());
-    }
+    //}
   }
 }
