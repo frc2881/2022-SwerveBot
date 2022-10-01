@@ -11,6 +11,7 @@ import frc.robot.subsystems.Launcher;
 
 public class RunFlywheel extends CommandBase {
   private final Launcher m_launcher;
+  private final String m_state;
   /** Creates a new RunFlywheel. */
   public RunFlywheel(Launcher launcher, String state) {
     m_launcher = launcher;
