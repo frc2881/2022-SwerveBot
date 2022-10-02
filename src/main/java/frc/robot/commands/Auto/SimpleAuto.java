@@ -22,12 +22,14 @@ public class SimpleAuto extends SequentialCommandGroup {
   public SimpleAuto(DrivetrainSubsystem drive, Launcher launcher, Feeder feeder) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new DefaultDriveCommand(drive, () -> 0.0, () -> 0.75, () -> 0.0).withTimeout(2.5),
+    addCommands(new InstantCommand(() -> drive.zeroGyroscope(), drive));
+      /*
+    new DefaultDriveCommand(drive, () -> 0.0, () -> 0.75, () -> 0.0).withTimeout(2.5),
                 new InstantCommand(() -> launcher.run("SHOOT"), launcher),
                 new WaitCommand(1.5),
                 new InstantCommand(() -> feeder.run("FEED"), feeder),
                 new WaitCommand(0.5),
                 new InstantCommand(() -> launcher.stop(), launcher),
-                new InstantCommand(() -> feeder.stop(), feeder));
+                new InstantCommand(() -> feeder.stop(), feeder)); */
   }
 }
