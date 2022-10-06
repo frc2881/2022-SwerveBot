@@ -89,7 +89,7 @@ public final class Constants {
     /**
      * The maximum speed that the intake motor runs.
      */
-    public static final double kMaxSpeed = 0.7;
+    public static final double kMaxSpeed = 0.85;
   }
 
     /**
