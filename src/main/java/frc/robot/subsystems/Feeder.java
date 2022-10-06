@@ -11,6 +11,7 @@ import static frc.robot.Constants.Feeder.defaultSpeed;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -61,5 +62,11 @@ public class Feeder extends SubsystemBase {
     else {
       return false;
     }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addBooleanProperty("Cargo Present", () -> !m_beamBreak.get(), null);
   }
 }
