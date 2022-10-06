@@ -88,13 +88,13 @@ public class RobotContainer {
             .whenPressed(m_drivetrainSubsystem::zeroGyroscope);
 
     new JoystickButton(driverController, XboxController.Button.kLeftBumper.value).
-            whileHeld(new RunIntake(m_intake, m_feeder));
+            whileHeld(new RunIntake(m_intake, m_feeder, driverController));
     
     buttonFromDouble(() -> driverController.getLeftTriggerAxis()).
             whileHeld(new ExtendIntake(m_intake));
     
     buttonFromDouble(() -> driverController.getRightTriggerAxis()).
-            whileHeld(new ExtendAndRunIntake(m_intake, m_feeder));
+            whileHeld(new ExtendAndRunIntake(m_intake, m_feeder, driverController));
 
     new JoystickButton(manipulatorController, XboxController.Button.kB.value).
             whileHeld(new HoldFeeder(m_feeder));
