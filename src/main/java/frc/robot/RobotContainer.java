@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.RunFlywheel;
+import frc.robot.commands.TurnTurret;
 import frc.robot.commands.Auto.SimpleAuto;
 import frc.robot.commands.Feeder.FeedFeeder;
 import frc.robot.commands.Feeder.HoldFeeder;
@@ -32,6 +33,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Launcher;
 import frc.robot.subsystems.Pneumatics;
 import frc.robot.subsystems.PrettyLights;
+import frc.robot.subsystems.Turret;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -49,6 +51,7 @@ public class RobotContainer {
   private final Feeder m_feeder = new Feeder();
   private final PrettyLights m_lights = new PrettyLights(powerHub);
   private final Hood m_hood = new Hood();
+  private final Turret m_turret = new Turret();
 
   private final XboxController driverController = new XboxController(0);
   private final XboxController manipulatorController = new XboxController(1);
@@ -98,7 +101,6 @@ public class RobotContainer {
 
     new JoystickButton(manipulatorController, XboxController.Button.kB.value).
             whileHeld(new HoldFeeder(m_feeder));
-
     new JoystickButton(manipulatorController, XboxController.Button.kLeftBumper.value).
             whileHeld(new RunFlywheel(m_launcher, "EJECT"));
 
@@ -107,6 +109,9 @@ public class RobotContainer {
 
     buttonFromDouble(() -> manipulatorController.getRightTriggerAxis()).
             whileHeld(new FeedFeeder(m_feeder));
+    
+    m_turret.setDefaultCommand(new TurnTurret(m_turret, () -> manipulatorController.getRightX()));
+
   }
 
   private Button buttonFromDouble(DoubleSupplier value) {

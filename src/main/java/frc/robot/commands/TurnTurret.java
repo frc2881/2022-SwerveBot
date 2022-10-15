@@ -1,69 +1,45 @@
-
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Feeder;
+package frc.robot.commands;
+
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Feeder;
+import frc.robot.subsystems.Turret;
 
-public class FeedFeeder extends CommandBase {
-  private Feeder m_feeder;
+public class TurnTurret extends CommandBase {
+  private Turret m_turret;
+  private DoubleSupplier m_position;
 
-  
-  private boolean firstBallOut;
-  public FeedFeeder(Feeder feeder) {
+  /** Creates a new TurnTurret. */
+  public TurnTurret(Turret turret, DoubleSupplier position) {
+    m_turret = turret;
+    m_position = position;
+    addRequirements(turret);
     // Use addRequirements() here to declare subsystem dependencies.
-    m_feeder = feeder;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    firstBallOut = false;
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-  
-    if(m_feeder.isBall() == false){
-      m_feeder.run("HOLD");
-    }
-    else{
-      m_feeder.run("FEED");
-    }
-    
-    
+    m_turret.turn(40 * m_position.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_feeder.stop();
+  
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    /*
-    if(firstBallOut == true){
-      
-    }
-    else{
-      return false;
-    }
-  }
-  */
-  /*
-  if(m_feeder.isBall() == false){
-    return true;
-  }
-  else{
     return false;
   }
-  */
-  return false;
-}
 }
