@@ -97,6 +97,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
+  private boolean robotCentic = false;
+
   public DrivetrainSubsystem() {
     ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
 
@@ -184,10 +186,24 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_navx.zeroYaw();
   }
 
+  public void makeRobotCentric() {
+        if(robotCentic == false){
+                robotCentic = true;
+        }
+        
+  }
+
+  public void makeFieldCentric() {
+        if(robotCentic == true){
+                robotCentic = false;
+        }
+        
+  }
+
   public Rotation2d getGyroscopeRotation() {
     // FIXME Remove if you are using a Pigeon
 //    return Rotation2d.fromDegrees(m_pigeon.getFusedHeading());
-
+     if(robotCentic == false){   
     // FIXME Uncomment if you are using a NavX
     if (m_navx.isMagnetometerCalibrated()) {
       // We will only get valid fused headings if the magnetometer is calibrated
@@ -196,6 +212,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
     return Rotation2d.fromDegrees(360.0 - m_navx.getYaw());
+}
+else{
+        return new Rotation2d(0);
+}
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
