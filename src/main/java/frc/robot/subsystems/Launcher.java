@@ -49,7 +49,7 @@ public class Launcher extends SubsystemBase {
     if (state == "SHOOT"){
       m_mainFlywheel.set(0.55);
       m_topRollers.set(-0.55);
-      // 0.675, -0.925
+      // 81 in: main:0.55  top:-0.55
     }
     else if (state == "EJECT"){
       m_mainFlywheel.set(0.3);
