@@ -47,9 +47,9 @@ public class Launcher extends SubsystemBase {
     //m_newFlyWheelSpeed = SmartDashboard.getNumber("Flywheel Speed", 0);
     //m_newTopRollersSpeed = SmartDashboard.getNumber("Top Rollers Speed", 0);
     if (state == "SHOOT"){
-      m_mainFlywheel.set(0.575);
-      m_topRollers.set(-0.625);
-
+      m_mainFlywheel.set(0.55);
+      m_topRollers.set(-0.55);
+      // 0.675, -0.925
     }
     else if (state == "EJECT"){
       m_mainFlywheel.set(0.3);
