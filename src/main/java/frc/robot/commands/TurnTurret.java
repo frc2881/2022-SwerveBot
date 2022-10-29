@@ -7,6 +7,7 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
 
 public class TurnTurret extends CommandBase {
@@ -28,7 +29,7 @@ public class TurnTurret extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_turret.turn(40 * m_position.getAsDouble());
+    m_turret.turn(Constants.Turret.softLimitFor * m_position.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

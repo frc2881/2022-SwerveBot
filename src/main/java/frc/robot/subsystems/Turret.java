@@ -15,34 +15,26 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Turret extends SubsystemBase {
-  private final int m_softLimitFor = 40;
-  private final int m_softLimitRev = -40;
 
-  private final double m_P = 0.015;
-  private final double m_I = 0;
-  private final double m_D = 0.5;
-
-  private final double m_positionConversionFactor = 28;
-
-  private final CANSparkMax m_turret = new CANSparkMax(Constants.Launcher.turret, MotorType.kBrushless);
+  private final CANSparkMax m_turret = new CANSparkMax(Constants.Turret.turret, MotorType.kBrushless);
   private final RelativeEncoder m_encoder;
   private final SparkMaxPIDController m_PIDController;
   /** Creates a new Turret. */
   public Turret() {
     m_encoder = m_turret.getEncoder();
 
-    m_encoder.setPositionConversionFactor(m_positionConversionFactor);
-    m_encoder.setVelocityConversionFactor(m_positionConversionFactor / 60);
+    m_encoder.setPositionConversionFactor(Constants.Turret.positionConversionFactor);
+    m_encoder.setVelocityConversionFactor(Constants.Turret.positionConversionFactor / 60);
 
     m_PIDController = m_turret.getPIDController();
 
-    m_PIDController.setP(m_P);
-    m_PIDController.setI(m_I);
-    m_PIDController.setD(m_D);
+    m_PIDController.setP(Constants.Turret.P);
+    m_PIDController.setI(Constants.Turret.I);
+    m_PIDController.setD(Constants.Turret.D);
     m_PIDController.setSmartMotionAllowedClosedLoopError(1, 0);
 
-    m_turret.setSoftLimit(SoftLimitDirection.kForward, m_softLimitFor);
-    m_turret.setSoftLimit(SoftLimitDirection.kReverse, m_softLimitRev);
+    m_turret.setSoftLimit(SoftLimitDirection.kForward, Constants.Turret.softLimitFor);
+    m_turret.setSoftLimit(SoftLimitDirection.kReverse, Constants.Turret.softLimitRev);
   }
 
   @Override

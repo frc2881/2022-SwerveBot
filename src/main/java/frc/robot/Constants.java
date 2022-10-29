@@ -63,8 +63,20 @@ public final class Constants {
 
     public static final int mainFlywheel = 14;
 
-    public static final int turret = 15;
 
+  }
+
+  public static final class Turret {
+    public static final int turret = 15;
+    
+    public static final int softLimitFor = 40;
+    public static final int softLimitRev = -40;
+
+    public static final double P = 0.015;
+    public static final double I = 0;
+    public static final double D = 0.5;
+
+    public static final double positionConversionFactor = 28;
   }
 
       /**
