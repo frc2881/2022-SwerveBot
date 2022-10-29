@@ -14,9 +14,9 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.ChangeRobotCentric;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.RunFlywheel;
 import frc.robot.commands.TurnTurret;
@@ -101,8 +101,12 @@ public class RobotContainer {
 
     new JoystickButton(manipulatorController, XboxController.Button.kB.value).
             whileHeld(new HoldFeeder(m_feeder));
+
     new JoystickButton(manipulatorController, XboxController.Button.kLeftBumper.value).
             whileHeld(new RunFlywheel(m_launcher, "EJECT"));
+
+    new JoystickButton(driverController, XboxController.Button.kRightBumper.value).
+            whileHeld(new ChangeRobotCentric(m_drivetrainSubsystem));
 
     buttonFromDouble(() -> manipulatorController.getLeftTriggerAxis()).
             whileHeld(new RunFlywheel(m_launcher, "SHOOT"));
