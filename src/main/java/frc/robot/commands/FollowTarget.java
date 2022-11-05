@@ -32,8 +32,6 @@ public class FollowTarget extends CommandBase {
   public void execute() {
     double yaw = m_vision.getYaw();
     double position = m_turret.returnEncoderPosition();
-    System.out.println(yaw);
-    System.out.println(position);
 
     double change = position - yaw;
 
