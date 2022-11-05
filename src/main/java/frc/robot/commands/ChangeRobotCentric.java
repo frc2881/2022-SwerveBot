@@ -9,9 +9,9 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class ChangeRobotCentric extends CommandBase {
   private final DrivetrainSubsystem m_drive;
-  /** Creates a new ChangeRobotcentric. */
+  
   public ChangeRobotCentric(DrivetrainSubsystem drive) {
-    // Use addRequirements() here to declare subsystem dependencies.
+    
     m_drive = drive;
     
   }

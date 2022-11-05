@@ -4,22 +4,23 @@
 
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.subsystems.VisionTracking;
 import frc.robot.subsystems.Turret;
 
-public class TurnTurret extends CommandBase {
-  private Turret m_turret;
-  private DoubleSupplier m_position;
+public class FollowTarget extends CommandBase {
+  private final VisionTracking m_vision;
+  private final Turret m_turret;
 
-  
-  public TurnTurret(Turret turret, DoubleSupplier position) {
+
+  /** Creates a new followTarget. */
+  public FollowTarget(VisionTracking vision, Turret turret) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    m_vision = vision;
     m_turret = turret;
-    m_position = position;
-    addRequirements(turret);
+    
 
+    addRequirements(m_turret);
   }
 
   // Called when the command is initially scheduled.
@@ -29,14 +30,21 @@ public class TurnTurret extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_turret.turn(Constants.Turret.softLimitFor * m_position.getAsDouble());
+    double yaw = m_vision.getYaw();
+    double position = m_turret.returnEncoderPosition();
+    System.out.println(yaw);
+    System.out.println(position);
+
+    double change = position - yaw;
+
+    m_turret.turn(change);
+
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

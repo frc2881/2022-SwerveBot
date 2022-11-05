@@ -5,12 +5,13 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -35,6 +36,7 @@ public class Turret extends SubsystemBase {
 
     m_turret.setSoftLimit(SoftLimitDirection.kForward, Constants.Turret.softLimitFor);
     m_turret.setSoftLimit(SoftLimitDirection.kReverse, Constants.Turret.softLimitRev);
+    
   }
 
   @Override
@@ -44,5 +46,9 @@ public class Turret extends SubsystemBase {
 
   public void turn(double angle) {
     m_PIDController.setReference(angle, ControlType.kPosition);
+  }
+
+  public double returnEncoderPosition() {
+    return m_encoder.getPosition();
   }
 }

@@ -162,11 +162,7 @@ public class VisionTracking extends SubsystemBase {
   public double getYaw() {
     double yaw = computeYaw();
 
-    if((SmartDashboard.getBoolean("Disable Vision", false) == true) ||
-       (m_disableVis == true)) {
-      // possibly want different outcome
-      yaw = 0;
-    } else if(yaw >= 1000) {
+    if(yaw >= 1000) {
       yaw = 0;
     }
 

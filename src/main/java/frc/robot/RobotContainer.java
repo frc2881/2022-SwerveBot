@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ChangeRobotCentric;
 import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.FollowTarget;
 import frc.robot.commands.RunFlywheel;
 import frc.robot.commands.TurnTurret;
 import frc.robot.commands.Auto.SimpleAuto;
@@ -34,6 +35,7 @@ import frc.robot.subsystems.Launcher;
 import frc.robot.subsystems.Pneumatics;
 import frc.robot.subsystems.PrettyLights;
 import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.VisionTracking;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -52,6 +54,7 @@ public class RobotContainer {
   private final PrettyLights m_lights = new PrettyLights(powerHub);
   private final Hood m_hood = new Hood();
   private final Turret m_turret = new Turret();
+  private final VisionTracking m_vision = new VisionTracking();
 
   private final XboxController driverController = new XboxController(0);
   private final XboxController manipulatorController = new XboxController(1);
@@ -71,8 +74,12 @@ public class RobotContainer {
             () -> -modifyAxis(driverController.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
             () -> -modifyAxis(driverController.getRightX()) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
+
+    
     // Configure the button bindings
     configureButtonBindings();
+
+    m_turret.setDefaultCommand(new FollowTarget(m_vision, m_turret));
 
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
