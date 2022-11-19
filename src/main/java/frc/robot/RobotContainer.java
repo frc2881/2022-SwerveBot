@@ -6,6 +6,9 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -21,7 +24,6 @@ import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.FollowTarget;
 import frc.robot.commands.RunFlywheel;
 import frc.robot.commands.TurnTurret;
-import frc.robot.commands.Auto.SimpleAuto;
 import frc.robot.commands.Feeder.FeedFeeder;
 import frc.robot.commands.Feeder.HoldFeeder;
 import frc.robot.commands.Intake.ExtendAndRunIntake;
@@ -58,6 +60,9 @@ public class RobotContainer {
 
   private final XboxController driverController = new XboxController(0);
   private final XboxController manipulatorController = new XboxController(1);
+
+  private final PathPlannerTrajectory forward = PathPlanner.loadPath("Forward", 1, 1);
+
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -141,7 +146,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new SimpleAuto(m_drivetrainSubsystem, m_launcher, m_feeder);
+    return m_drivetrainSubsystem.followTrajectoryCommand(forward, true);
   }
 
   private static double deadband(double value, double deadband) {

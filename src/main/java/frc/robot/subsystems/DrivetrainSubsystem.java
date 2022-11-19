@@ -23,11 +23,17 @@ import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_ENCODER;
 import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_MOTOR;
 import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_OFFSET;
 
+import java.util.HashMap;
+
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -35,6 +41,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -42,6 +49,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -109,7 +120,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         private final SwerveModule m_frontRightModule;
         private final SwerveModule m_backLeftModule;
         private final SwerveModule m_backRightModule;
-        
+
         private final Field2d m_field = new Field2d();
 
         private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -294,6 +305,30 @@ public class DrivetrainSubsystem extends SubsystemBase {
         public void drive(ChassisSpeeds chassisSpeeds) {
                 m_chassisSpeeds = chassisSpeeds;
         }
+
+        // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
+public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> {
+              // Reset odometry for the first path you run during auto
+              if(isFirstPath){
+                  this.resetOdometry(this.getPose());
+              }
+            }),
+            
+            new PPSwerveControllerCommand(
+                traj, 
+                this::getPose, // Pose supplier
+                Constants.swerveKinematics, // SwerveDriveKinematics
+                new PIDController(Constants.Trajectory.xP, Constants.Trajectory.xI, Constants.Trajectory.xD), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                new PIDController(Constants.Trajectory.yP, Constants.Trajectory.yI, Constants.Trajectory.yD), // Y controller (usually the same values as X controller)
+                new ProfiledPIDController(Constants.Trajectory.tP, Constants.Trajectory.tI, Constants.Trajectory.tD, new Constraints(1, 1)), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                this::setModuleStates, // Module states consumer
+                this // Requires this drive subsystem
+            )
+        );
+    }
 
         @Override
         public void periodic() {
