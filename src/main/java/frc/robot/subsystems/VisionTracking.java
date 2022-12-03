@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class VisionTracking extends SubsystemBase {
-  private final PhotonCamera m_visionCamera = new PhotonCamera("photonvision");
-  private final PhotonCamera m_frontCamera = new PhotonCamera("frontCamera");
+  private final PhotonCamera m_visionCamera = new PhotonCamera("Vision");
+  private final PhotonCamera m_frontCamera = new PhotonCamera("Driver");
   private final DoubleLogEntry m_logArea;
   private final DoubleLogEntry m_logPitch;
   private final DoubleLogEntry m_logSkew;
