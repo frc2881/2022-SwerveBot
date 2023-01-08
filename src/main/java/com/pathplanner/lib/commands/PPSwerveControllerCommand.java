@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.subsystems.DrivetrainSubsystem;
 
 /**
  * A command that uses two PID controllers ({@link PIDController}) and a
@@ -40,11 +41,13 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 @SuppressWarnings("MemberName")
 public class PPSwerveControllerCommand extends CommandBase {
     private final Timer m_timer = new Timer();
+    private final DrivetrainSubsystem m_drive;
     private final PathPlannerTrajectory m_trajectory;
     private final Supplier<Pose2d> m_pose;
     private final SwerveDriveKinematics m_kinematics;
     private final HolonomicDriveController m_controller;
     private final Consumer<SwerveModuleState[]> m_outputModuleStates;
+    public boolean m_resetodometry;
 
     /**
      * Constructs a new PPSwerveControllerCommand that when executed will follow the
@@ -76,6 +79,7 @@ public class PPSwerveControllerCommand extends CommandBase {
      */
     @SuppressWarnings("ParameterName")
     public PPSwerveControllerCommand(
+            DrivetrainSubsystem drive,
             PathPlannerTrajectory trajectory,
             Supplier<Pose2d> pose,
             SwerveDriveKinematics kinematics,
@@ -83,17 +87,20 @@ public class PPSwerveControllerCommand extends CommandBase {
             PIDController yController,
             ProfiledPIDController thetaController,
             Consumer<SwerveModuleState[]> outputModuleStates,
-            Subsystem... requirements) {
+            boolean resetodemetry,
+            Subsystem... requirements
+                ) {
         m_trajectory = trajectory;
         m_pose = pose;
         m_kinematics = kinematics;
-
+        m_drive = drive;
         m_controller = new HolonomicDriveController(
                 xController,
                 yController,
                 thetaController);
 
         m_outputModuleStates = outputModuleStates;
+            //m_resetodometry = resetdometry;
 
         addRequirements(requirements);
     }
@@ -102,6 +109,8 @@ public class PPSwerveControllerCommand extends CommandBase {
     public void initialize() {
         m_timer.reset();
         m_timer.start();
+        m_drive.resetOdometry(m_trajectory.getInitialPose());
+        
     }
 
     @Override
@@ -119,6 +128,9 @@ public class PPSwerveControllerCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_timer.stop();
+
+        SwerveModuleState[] stopModuleStates = {new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
+        m_outputModuleStates.accept(stopModuleStates);
     }
 
     @Override

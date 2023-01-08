@@ -251,16 +251,29 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
 
         public void resetOdometry(Pose2d pose) {
-                swerveOdometry.resetPosition(pose, getGyroscopeRotation());
+                swerveOdometry.resetPosition(pose, /*getGyroscopeRotation()*/ new Rotation2d(0));
         }
 
         /* Used by SwerveFollowCommand in Auto */
         public void setModuleStates(SwerveModuleState[] desiredStates) {
-    DataLogManager.log("setModuleState Begin");
+    //DataLogManager.log("setModuleState Begin");
                 SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.maxSpeed);
                 
 
-    DataLogManager.log("setModuleState End");
+                m_frontRightModule.set(
+                        desiredStates[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+                        desiredStates[0].angle.getRadians());
+                m_frontLeftModule.set(
+                        desiredStates[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+                        desiredStates[1].angle.getRadians());
+                m_backRightModule.set(
+                        desiredStates[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+                        desiredStates[2].angle.getRadians());
+                m_backLeftModule.set(
+                        desiredStates[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+                        desiredStates[3].angle.getRadians());
+
+    //DataLogManager.log("setModuleState End");
         }
 
         public Pose2d getPose() {
@@ -283,6 +296,7 @@ public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFir
             }),
             
             new PPSwerveControllerCommand(
+                this,
                 traj, 
                 this::getPose, // Pose supplier
                 Constants.swerveKinematics, // SwerveDriveKinematics
@@ -290,6 +304,7 @@ public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFir
                 new PIDController(Constants.Trajectory.yP, Constants.Trajectory.yI, Constants.Trajectory.yD), // Y controller (usually the same values as X controller)
                 new ProfiledPIDController(Constants.Trajectory.tP, Constants.Trajectory.tI, Constants.Trajectory.tD, new Constraints(1, 1)), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
                 this::setModuleStates, // Module states consumer
+                true, //reset odom
                 this // Requires this drive subsystem
             )
         );
@@ -299,7 +314,8 @@ public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFir
         public void periodic() {
                 SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
                 SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
-
+                
+                if(DriverStation.isAutonomous() != true){
                 if ((states[0].speedMetersPerSecond < 0.1) && (states[1].speedMetersPerSecond < 0.1) &&
                                 (states[2].speedMetersPerSecond < 0.1) && (states[3].speedMetersPerSecond < 0.1) &&
                                 !DriverStation.isAutonomous()) {
@@ -321,5 +337,6 @@ public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFir
                                         states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
                                         states[3].angle.getRadians());
                 }
+        }
         }
 }

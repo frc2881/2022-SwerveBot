@@ -117,19 +117,23 @@ public static final double maxSpeed = 4.8;// 4.5; //meters per second
 
   public static final class Trajectory {
     
-    public static final double xP = 0;
+    public static final double xP = 0.125;
 
     public static final double xI = 0;
 
     public static final double xD = 0;
 
-    public static final double yP = 0;
+
+
+    public static final double yP = 0.1875;
 
     public static final double yI = 0;
 
     public static final double yD = 0;
 
-    public static final double tP = 0;
+
+
+    public static final double tP = 0.25;
 
     public static final double tI = 0;
 
