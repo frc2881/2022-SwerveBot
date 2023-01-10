@@ -220,7 +220,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         public void makeRobotCentric() {
                 if (robotCentic == false) {
-                        robotCentic = true;
+                       // robotCentic = true;
                 }
 
         }
@@ -251,7 +251,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
 
         public void resetOdometry(Pose2d pose) {
-                swerveOdometry.resetPosition(pose, /*getGyroscopeRotation()*/ new Rotation2d(0));
+                swerveOdometry.resetPosition(pose, new Rotation2d(0)); 
+                //swerveOdometry.resetPosition(pose, getGyroscopeRotation());
         }
 
         /* Used by SwerveFollowCommand in Auto */

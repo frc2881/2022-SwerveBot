@@ -133,7 +133,7 @@ public static final double maxSpeed = 4.8;// 4.5; //meters per second
 
 
 
-    public static final double tP = 0.25;
+    public static final double tP = 0;
 
     public static final double tI = 0;
 
