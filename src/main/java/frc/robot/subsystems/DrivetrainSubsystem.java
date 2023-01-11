@@ -40,7 +40,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -56,7 +55,6 @@ import frc.robot.Constants;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
-        public SwerveDriveOdometry swerveOdometry;
         /**
          * The maximum voltage that will be delivered to the drive motors.
          * <p>
@@ -118,6 +116,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         private final SwerveModule m_frontRightModule;
         private final SwerveModule m_backLeftModule;
         private final SwerveModule m_backRightModule;
+        private final SwerveDriveOdometry m_Odometry;
 
         private final Field2d m_field = new Field2d();
 
@@ -128,8 +127,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         public DrivetrainSubsystem() {
                 ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
 
-                
-                swerveOdometry = new SwerveDriveOdometry(Constants.swerveKinematics, getGyroscopeRotation());
+                SmartDashboard.putData("Field", m_field);
 
                 // There are 4 methods you can call to create your swerve modules.
                 // The method you use depends on what motors you are using.
@@ -203,6 +201,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
                                 BACK_RIGHT_MODULE_STEER_MOTOR,
                                 BACK_RIGHT_MODULE_STEER_ENCODER,
                                 BACK_RIGHT_MODULE_STEER_OFFSET);
+
+                m_Odometry = new SwerveDriveOdometry(
+                                m_kinematics, getGyroscopeRotation());
+
         }
 
         /**
@@ -220,7 +222,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         public void makeRobotCentric() {
                 if (robotCentic == false) {
-                       // robotCentic = true;
+                        // robotCentic = true;
                 }
 
         }
@@ -251,93 +253,112 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
 
         public void resetOdometry(Pose2d pose) {
-                swerveOdometry.resetPosition(pose, new Rotation2d(0)); 
-                //swerveOdometry.resetPosition(pose, getGyroscopeRotation());
+                m_Odometry.resetPosition(pose, new Rotation2d(0));
+                // swerveOdometry.resetPosition(pose, getGyroscopeRotation());
         }
 
         /* Used by SwerveFollowCommand in Auto */
         public void setModuleStates(SwerveModuleState[] desiredStates) {
-    //DataLogManager.log("setModuleState Begin");
+                // DataLogManager.log("setModuleState Begin");
                 SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.maxSpeed);
-                
 
-                m_frontRightModule.set(
-                        desiredStates[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-                        desiredStates[0].angle.getRadians());
                 m_frontLeftModule.set(
-                        desiredStates[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-                        desiredStates[1].angle.getRadians());
-                m_backRightModule.set(
-                        desiredStates[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-                        desiredStates[2].angle.getRadians());
+                                desiredStates[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+                                desiredStates[0].angle.getRadians());
+                m_frontRightModule.set(
+                                desiredStates[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+                                desiredStates[1].angle.getRadians());
                 m_backLeftModule.set(
-                        desiredStates[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-                        desiredStates[3].angle.getRadians());
+                                desiredStates[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+                                desiredStates[2].angle.getRadians());
+                m_backRightModule.set(
+                                desiredStates[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+                                desiredStates[3].angle.getRadians());
 
-    //DataLogManager.log("setModuleState End");
+                // DataLogManager.log("setModuleState End");
         }
 
         public Pose2d getPose() {
-                return swerveOdometry.getPoseMeters();
+                return m_Odometry.getPoseMeters();
         }
 
         public void drive(ChassisSpeeds chassisSpeeds) {
                 m_chassisSpeeds = chassisSpeeds;
         }
 
-        // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
-public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+        // Assuming this method is part of a drivetrain subsystem that provides the
+        // necessary methods
+        public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
 
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> {
-              // Reset odometry for the first path you run during auto
-              if(isFirstPath){
-                  this.resetOdometry(this.getPose());
-              }
-            }),
-            
-            new PPSwerveControllerCommand(
-                this,
-                traj, 
-                this::getPose, // Pose supplier
-                Constants.swerveKinematics, // SwerveDriveKinematics
-                new PIDController(Constants.Trajectory.xP, Constants.Trajectory.xI, Constants.Trajectory.xD), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-                new PIDController(Constants.Trajectory.yP, Constants.Trajectory.yI, Constants.Trajectory.yD), // Y controller (usually the same values as X controller)
-                new ProfiledPIDController(Constants.Trajectory.tP, Constants.Trajectory.tI, Constants.Trajectory.tD, new Constraints(1, 1)), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-                this::setModuleStates, // Module states consumer
-                true, //reset odom
-                this // Requires this drive subsystem
-            )
-        );
-    }
+                return new SequentialCommandGroup(
+                                new InstantCommand(() -> {
+                                        // Reset odometry for the first path you run during auto
+                                        if (isFirstPath) {
+                                                this.resetOdometry(this.getPose());
+                                        }
+                                }),
+
+                                new PPSwerveControllerCommand(
+                                                this,
+                                                traj,
+                                                this::getPose, // Pose supplier
+                                                Constants.swerveKinematics, // SwerveDriveKinematics
+                                                new PIDController(Constants.Trajectory.xP, Constants.Trajectory.xI,
+                                                                Constants.Trajectory.xD), // X controller. Tune these
+                                                                                          // values for your robot.
+                                                                                          // Leaving them 0 will only
+                                                                                          // use feedforwards.
+                                                new PIDController(Constants.Trajectory.yP, Constants.Trajectory.yI,
+                                                                Constants.Trajectory.yD), // Y controller (usually the
+                                                                                          // same values as X
+                                                                                          // controller)
+                                                new ProfiledPIDController(Constants.Trajectory.tP,
+                                                                Constants.Trajectory.tI, Constants.Trajectory.tD,
+                                                                new Constraints(1, 1)), // Rotation controller. Tune
+                                                                                        // these values for your robot.
+                                                                                        // Leaving them 0 will only use
+                                                                                        // feedforwards.
+                                                this::setModuleStates, // Module states consumer
+                                                true, // reset odom
+                                                this // Requires this drive subsystem
+                                ));
+        }
 
         @Override
         public void periodic() {
+
                 SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
                 SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
-                
-                if(DriverStation.isAutonomous() != true){
-                if ((states[0].speedMetersPerSecond < 0.1) && (states[1].speedMetersPerSecond < 0.1) &&
-                                (states[2].speedMetersPerSecond < 0.1) && (states[3].speedMetersPerSecond < 0.1) &&
-                                !DriverStation.isAutonomous()) {
-                        m_frontLeftModule.set(0, Math.toRadians(45));
-                        m_frontRightModule.set(0, Math.toRadians(-45));
-                        m_backLeftModule.set(0, Math.toRadians(-45));
-                        m_backRightModule.set(0, Math.toRadians(45));
-                } else {
-                        m_frontLeftModule.set(
-                                        states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-                                        states[0].angle.getRadians());
-                        m_frontRightModule.set(
-                                        states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-                                        states[1].angle.getRadians());
-                        m_backLeftModule.set(
-                                        states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-                                        states[2].angle.getRadians());
-                        m_backRightModule.set(
-                                        states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
-                                        states[3].angle.getRadians());
+                m_Odometry.update(getGyroscopeRotation(), states);
+                m_field.setRobotPose(m_Odometry.getPoseMeters());
+
+                if (DriverStation.isAutonomous() != true) {
+                        if ((states[0].speedMetersPerSecond < 0.1) && (states[1].speedMetersPerSecond < 0.1) &&
+                                        (states[2].speedMetersPerSecond < 0.1) && (states[3].speedMetersPerSecond < 0.1)
+                                        &&
+                                        !DriverStation.isAutonomous()) {
+                                m_frontLeftModule.set(0, Math.toRadians(45));
+                                m_frontRightModule.set(0, Math.toRadians(-45));
+                                m_backLeftModule.set(0, Math.toRadians(-45));
+                                m_backRightModule.set(0, Math.toRadians(45));
+                        } else {
+                                m_frontLeftModule.set(
+                                                states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND
+                                                                * MAX_VOLTAGE,
+                                                states[0].angle.getRadians());
+                                m_frontRightModule.set(
+                                                states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND
+                                                                * MAX_VOLTAGE,
+                                                states[1].angle.getRadians());
+                                m_backLeftModule.set(
+                                                states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND
+                                                                * MAX_VOLTAGE,
+                                                states[2].angle.getRadians());
+                                m_backRightModule.set(
+                                                states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND
+                                                                * MAX_VOLTAGE,
+                                                states[3].angle.getRadians());
+                        }
                 }
-        }
         }
 }
